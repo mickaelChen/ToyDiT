@@ -1,5 +1,15 @@
 # Is LayerNorm in DiT a problem?
 
+*tl;dr*: Probably not. DiT are PixArt models work very well in practice. The network can effectively (if not perfectly) find work-arounds to the normalizations, by inserting a few very large values. 
+
+I suppose there could be issues in some edge-cases, such as very aggressive weight-decay and drop-out, that would hinder the ability of the model to build and effectively use the large values. Also, it doesn't seem productive to, why add a layer that the network has to actively work against, but it does not seem to prevent the network from learning anyway.
+
+So what do we do here?
+1. We observe that the DiT actively try to work against the layer normalization, by inserting a few very large values in its embeddings.
+2. We check how much that trick can allow the DiT to retain information from the input with a controlled toy experiment.
+
+# DiT and LayerNorm
+
 In DiT architecture, there is a LayerNorm before every layer.
 
 <img alt="DiT Architecture" src="res/dit.png" width=40% height=40%>
@@ -31,7 +41,7 @@ However, as evidenced by the last layer retaining normal values, the outlyer val
 # Inverting the LayerNorm?
 
 At the heart of the problem with normalization is that it destroy information, i.e. the layer is not invertible.
-However, we see in the previous visualization that a neural network can bypass that. In this section, we try to analyze the ability of a DiT to do so in a simple, controlled, experiment.
+However, we see in the previous visualization that a neural network can learn to bypass that. In this section, we try to analyze the ability of a DiT to do so in a simple, controlled, experiment.
 One easy way to do so is by checking how well a DiT can learn the identity function. 
 Because the model is trained to denoise, it's actually very easy to implement by training the model to generate a constant data (x = 0). 
 If the clean data is always 0, the input of the network is always exactly the noise it has to predict (scaled by a factor that is a function of t, the diffusion timestep).
@@ -43,8 +53,4 @@ We visualize the values of the outputs after 10k iterations and after 50k iterat
 <img alt="ToyDiT generation after 10k" src="res/toydit_10k.png"><img alt="ToyDiT generation after 50k" src="res/toydit_50k.png">
 
 We see that both models are able to generate pixels close enough to x = 0, but we see that without LayerNormalization, the model easily gets errors below 10e-3, in the order of 10e-4, that the model with layer normalization is not able to attain so far.
-
-# tl;dr: Is that a problem?
-Probably not. DiT are PixArt models work very well in practice, and the neural network can come up with effective solutions.
-
-It might run into conflicts with very some tricks such as very aggressive weight-decay and drop-out, that could hinder the ability of the model to build and effectively use the large values they insert. Also, it doesn't seem productive to, why add a layer that the network has to actively work against.
+Maybe not a big issue, but it's something to consider.
