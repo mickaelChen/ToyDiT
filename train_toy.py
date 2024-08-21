@@ -110,8 +110,10 @@ def main(args):
     # Create model:
     model = DiT_models[args.model](
         input_size=args.image_size,
+        in_channels=args.image_channels,
         num_classes=args.num_classes,
         normalization=args.normalization,
+        class_dropout_prob=0,
     )
     # Note that parameter initialization is done within the DiT constructor
     ema = deepcopy(model).to(device)  # Create an EMA of the model for use after training
@@ -141,7 +143,7 @@ def main(args):
     for epoch in range(args.epochs):
         logger.info(f"Beginning epoch {epoch}...")
         for iteration in range(0, epoch_length):
-            x = torch.rand(batch_size, 4, args.image_size, args.image_size).mul(2).add(-1) # x ~ Uniform[-1,1]
+            x = torch.zeros(batch_size, args.image_channels, args.image_size, args.image_size)
             y = torch.zeros(batch_size).long() # y = 0
             x = x.to(device)
             y = y.to(device)
@@ -200,7 +202,8 @@ if __name__ == "__main__":
     parser.add_argument("--results-dir", type=str, default="results")
     parser.add_argument("--model", type=str, choices=list(DiT_models.keys()), default="DiT-XS/1")
     parser.add_argument("--normalization", type=str, choices=["none", "layer-norm"], default="layer-norm")
-    parser.add_argument("--image-size", type=int, default=4)
+    parser.add_argument("--image-size", type=int, default=2)
+    parser.add_argument("--image-channels", type=int, default=2)
     parser.add_argument("--num-classes", type=int, default=1)
     parser.add_argument("--epochs", type=int, default=1400)
     parser.add_argument("--global-batch-size", type=int, default=2048)
