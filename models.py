@@ -102,11 +102,19 @@ class DiTBlock(nn.Module):
     """
     A DiT block with adaptive layer norm zero (adaLN-Zero) conditioning.
     """
-    def __init__(self, hidden_size, num_heads, mlp_ratio=4.0, **block_kwargs):
+    def __init__(self, hidden_size, num_heads, mlp_ratio=4.0, normalization="layer-norm", **block_kwargs):
         super().__init__()
-        self.norm1 = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
+
+        if normalization == "layer-norm":
+            self.norm1 = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
+            self.norm2 = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
+        elif normalization == "none":
+            self.norm1 = nn.Identity()
+            self.norm2 = nn.Identity()
+        else:
+            assert False
+
         self.attn = Attention(hidden_size, num_heads=num_heads, qkv_bias=True, **block_kwargs)
-        self.norm2 = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
         mlp_hidden_dim = int(hidden_size * mlp_ratio)
         approx_gelu = lambda: nn.GELU(approximate="tanh")
         self.mlp = Mlp(in_features=hidden_size, hidden_features=mlp_hidden_dim, act_layer=approx_gelu, drop=0)
@@ -126,9 +134,16 @@ class FinalLayer(nn.Module):
     """
     The final layer of DiT.
     """
-    def __init__(self, hidden_size, patch_size, out_channels):
+    def __init__(self, hidden_size, patch_size, out_channels, normalization="layer-norm"):
         super().__init__()
-        self.norm_final = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
+
+        if normalization == "layer-norm":
+            self.norm_final = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
+        elif normalization == "none":
+            self.norm_final = nn.Identity()
+        else:
+            assert False
+
         self.linear = nn.Linear(hidden_size, patch_size * patch_size * out_channels, bias=True)
         self.adaLN_modulation = nn.Sequential(
             nn.SiLU(),
@@ -158,6 +173,7 @@ class DiT(nn.Module):
         class_dropout_prob=0.1,
         num_classes=1000,
         learn_sigma=True,
+        normalization="layer-norm",
     ):
         super().__init__()
         self.learn_sigma = learn_sigma
@@ -174,9 +190,9 @@ class DiT(nn.Module):
         self.pos_embed = nn.Parameter(torch.zeros(1, num_patches, hidden_size), requires_grad=False)
 
         self.blocks = nn.ModuleList([
-            DiTBlock(hidden_size, num_heads, mlp_ratio=mlp_ratio) for _ in range(depth)
+            DiTBlock(hidden_size, num_heads, mlp_ratio=mlp_ratio, normalization=normalization) for _ in range(depth)
         ])
-        self.final_layer = FinalLayer(hidden_size, patch_size, self.out_channels)
+        self.final_layer = FinalLayer(hidden_size, patch_size, self.out_channels, normalization=normalization)
         self.initialize_weights()
 
     def initialize_weights(self):
