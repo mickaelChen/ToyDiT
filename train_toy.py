@@ -136,9 +136,8 @@ def main(args):
         logger = create_logger(None)
 
     # Create model:
-    latent_size = args.image_size // 8
     model = DiT_models[args.model](
-        input_size=latent_size,
+        input_size=args.image_size,
         num_classes=args.num_classes
     )
     # Note that parameter initialization is done within the DiT constructor
