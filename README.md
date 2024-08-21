@@ -50,6 +50,7 @@ So we build a very small DiT that we train to generate always null "images" of s
 We train one version with LayerNorm, and one where we removed the LayerNorm, with batch sizes 2048. Training script is `train_toy.py` 
 
 We visualize with `ToyDiT_visualization.ipynb` the values of the outputs after 10k iterations and after 50k iterations. To do so, we simply plot the values of each pixels in 2D (as they have 2 channels) for 100 samples (so in total 400 = 100 x 2 x 2 pixels).
+
 <img alt="ToyDiT generation after 10k" src="res/toydit_10k.png"><img alt="ToyDiT generation after 50k" src="res/toydit_50k.png">
 
 We see that both models are able to generate pixels close enough to x = 0, but we see that without LayerNormalization, the model easily gets errors below 10e-3, in the order of 10e-4, that the model with layer normalization is not able to attain so far.
