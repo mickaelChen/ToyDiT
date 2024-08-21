@@ -8,6 +8,8 @@ So what do we do here?
 1. We observe that the DiT actively try to work against the layer normalization, by inserting a few very large values in its embeddings.
 2. We check how much that trick can allow the DiT to retain information from the input with a controlled toy experiment.
 
+This repository is a fork from the [official DiT Pytorch repo](https://github.com/facebookresearch/DiT/tree/main).
+
 # DiT and LayerNorm
 
 In DiT architecture, there is a LayerNorm before every layer.
@@ -17,8 +19,6 @@ In DiT architecture, there is a LayerNorm before every layer.
 Normalization is an useful tool for deep neural networks, and create features that are invariant to scale and shift, which is usually a good thing.
 However, we posit that in the context of the denoising task, the scale and shift information of the input is useful and should be preserved.
 LayerNorm runs counter to that intuition and would destroy it instead.
-
-This repository aim to explore this hypothesis. It is a fork from the [official DiT Pytorch repo](https://github.com/facebookresearch/DiT/tree/main).
 
 # Visualizing Embeddings
 
