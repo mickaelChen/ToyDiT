@@ -1,4 +1,4 @@
-Update: I was pointed to this very nice paper [He et al.](arxiv.org/abs/2405.19279) that studies outlyer values and normalization in transformers, and proposes a replacement for normalization layers.
+Update: I was pointed to this very nice paper [He et al.](https://arxiv.org/abs/2405.19279) that studies outlyer values and normalization in transformers, and proposes a replacement for normalization layers.
 
 # Is LayerNorm in DiT a problem?
 
