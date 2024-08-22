@@ -2,7 +2,7 @@
 
 *tl;dr*: Probably not. DiT are PixArt models work very well in practice. The network can effectively (if not perfectly) find work-arounds to the normalizations, by inserting a few very large values. 
 
-I suppose there could be issues in some edge-cases, such as very aggressive weight-decay and drop-out, that would hinder the ability of the model to build and effectively use the large values. Also, it doesn't seem productive to, why add a layer that the network has to actively work against, but it does not seem to prevent the network from learning anyway.
+I suppose there could be issues in some edge-cases, such as very aggressive weight-decay and drop-out, that would hinder the ability of the model to build and effectively use the large values. Also, it doesn't seem productive to, why add a layer that the network has to actively work against? But it does not seem to prevent the network from learning anyway, with only minimal error.
 
 So what do we do here?
 1. We observe that the DiT actively try to work against the layer normalization, by inserting a few very large values in its embeddings.
@@ -44,7 +44,7 @@ At the heart of the problem with normalization is that it destroy information, i
 However, we see in the previous visualization that a neural network can learn to bypass that. In this section, we try to analyze the ability of a DiT to do so in a simple, controlled, experiment.
 One easy way to do so is by checking how well a DiT can learn the identity function. 
 Because the model is trained to denoise, it's actually very easy to implement by training the model to generate a constant data (x = 0). 
-If the clean data is always 0, the input of the network is always exactly the noise it has to predict (scaled by a factor that is a function of t, the diffusion timestep).
+If the clean data is always 0, the noise the network has to predict is also exactly its input, scaled by a factor that is a function of t, the diffusion timestep.
 
 So we build a very small DiT that we train to generate always null "images" of size 2x2x2. We remove the VAE and have the DiT operates directly on "pixels".
 We train one version with LayerNorm, and one where we removed the LayerNorm, with batch sizes 2048. Training script is `train_toy.py` 
