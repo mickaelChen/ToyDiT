@@ -54,4 +54,4 @@ We visualize with `ToyDiT_visualization.ipynb` the values of the outputs after 1
 <img alt="ToyDiT generation after 10k" src="res/toydit_10k.png"><img alt="ToyDiT generation after 50k" src="res/toydit_50k.png">
 
 We see that both models are able to generate pixels close enough to x = 0, but we see that without LayerNormalization, the model easily gets errors below 10e-3, in the order of 10e-4, that the model with layer normalization is not able to attain so far.
-Maybe not a big issue, but it's something to consider.
+In image application, the output will be multiplied by 255/2 and rounded to the nearest value. A 0.01 error can lead a 1/255 difference in the RGB value. Probably not a big issue, but it's something to consider.
