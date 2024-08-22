@@ -1,3 +1,5 @@
+Update: I was pointed to this very nice paper [He et al.](arxiv.org/abs/2405.19279) that studies outlyer values and normalization in transformers, and proposes a replacement for normalization layers.
+
 # Is LayerNorm in DiT a problem?
 
 *tl;dr*: Probably not. DiT are PixArt models work very well in practice. The network can effectively (if not perfectly) find work-arounds to the normalizations, by inserting a few very large values. 
